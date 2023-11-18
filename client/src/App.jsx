@@ -9,6 +9,7 @@ const baseUrl = "http://localhost:3030/jsonstore/todos";
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [showAddTodo, setShowAddTodo] = useState(false);
 
   useEffect(() => {
     fetch(baseUrl)
@@ -18,7 +19,7 @@ function App() {
     })
   }, []);
 
-  const onTodoAdd = async(values) => {
+  const onTodoAddSubmit = async(values) => {
     const response = await fetch(baseUrl, {
       method: 'POST',
       headers:{
@@ -28,15 +29,35 @@ function App() {
     });
 
     const result = await response.json();
-    console.log(result);
+
+    setShowAddTodo(false);
+    setTodos(state => [...state, result])
+  };
+
+  const onTodoAddClick = () => {
+    setShowAddTodo(true);
+  };
+
+  const onTodoAddClose = () => {
+    setShowAddTodo(false);
+  };
+
+  const onTodoDeleteClick = async (todoId) => {
+    await fetch(`${baseUrl}/${todoId}`, {method:'DELETE'});
+
+    setTodos(state => state.filter(x =>  x._id !== todoId));
   }
 
   return (
     <>
       <Header />
-      <TodoList todos={todos} />
+      <TodoList 
+      todos={todos} 
+      onTodoAddClick={onTodoAddClick}
+      onTodoDeleteClick={onTodoDeleteClick}
+      />
 
-      <AddTodoModal onTodoAdd={onTodoAdd}/>
+      <AddTodoModal  show={showAddTodo} onTodoAddSubmit={onTodoAddSubmit} onTodoAddClose={onTodoAddClose}/>
     </>
   );
 }

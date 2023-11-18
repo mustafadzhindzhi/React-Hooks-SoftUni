@@ -1,12 +1,12 @@
-import { ListGroup } from "react-bootstrap"
+import { ListGroup, Button } from "react-bootstrap";
 
-export const Todoitem = ({
-    text, 
-    isCompleted
-}) => {
-    return(
-        <ListGroup.Item action>
-        {text}
-        </ListGroup.Item>
-    )
-}
+export const Todoitem = ({ _id, text, isCompleted, onTodoDeleteClick }) => {
+  return (
+    <ListGroup.Item action style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>{text}</div>
+      <div>
+        <Button variant="dark" onClick={() => onTodoDeleteClick(_id)}>X</Button>
+      </div>
+    </ListGroup.Item>
+  );
+};
