@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { TodoContext } from "./contexts/TodoContext.jsx"; 
+
 import { Header } from "./components/Header.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { TodoList } from "./components/TodoList.jsx";
@@ -46,19 +48,38 @@ function App() {
     await fetch(`${baseUrl}/${todoId}`, {method:'DELETE'});
 
     setTodos(state => state.filter(x =>  x._id !== todoId));
+  };
+
+  const onTodoClick = async(todoId) => {
+    const todo = todos.find(x => x._id === todoId);
+    await fetch(`${baseUrl}/${todoId}`, {
+      method:'PUT',
+      headers:{
+        'content-type':'application/json'
+      },
+    body: JSON.stringify({...todo, isCompleted: !todo.isCompleted})
+  });
+
+    setTodos(state => state.map(x =>  x._id === todoId ? {...x, isCompleted: !x.isCompleted}: x));
+  }
+
+  const contextValue = {
+    onTodoDeleteClick,
+    onTodoClick
   }
 
   return (
+    <TodoContext.Provider value={contextValue}>
     <>
       <Header />
       <TodoList 
       todos={todos} 
       onTodoAddClick={onTodoAddClick}
-      onTodoDeleteClick={onTodoDeleteClick}
       />
 
       <AddTodoModal  show={showAddTodo} onTodoAddSubmit={onTodoAddSubmit} onTodoAddClose={onTodoAddClose}/>
     </>
+    </TodoContext.Provider>
   );
 }
 
